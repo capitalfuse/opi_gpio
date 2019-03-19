@@ -14,7 +14,7 @@ pip install OPi.GPIO
 ```
 -------------
 
-According to the Home Assistant instruction, deploy it into **config_folder/custom_components** folder, but not works, so need to copy it into **homeassistant/component** folder.
+According to the Home Assistant instruction, deploy this into **config_folder/custom_components** folder, but not works, so need to copy this into **homeassistant/component** folder.
 
 -------------
 OPi.GPIO Component is not only for Orangepi ZERO, but also other Orangepi models like lite, one, pc and so on. 
