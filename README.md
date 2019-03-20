@@ -14,7 +14,7 @@ pip install OPi.GPIO
 ```
 -------------
 
-According to the Home Assistant instruction, deploy this into **config_folder/custom_components** folder, but not works, so need to copy this into **homeassistant/component** folder.
+According to the Home Assistant instruction, put this into **config_folder/custom_components** folder, but not works, so need to copy this into **homeassistant/component** folder.
 
 -------------
 OPi.GPIO Component is not only for Orangepi ZERO, but also other Orangepi models like lite, one, pc and so on. 
@@ -61,7 +61,7 @@ BCM to GPIO
     40: 199,  # PG7 (UART1_RX/PG_EINT7)
 ```   
 
-Home Assistant not working by root user, so need to add group "gpio" and belongs home user to it.
+Home Assistant not working by root user, so need to add group "gpio" and the hass user belongs to it.
 
 ```
 $ sudo usermod -aG gpio <current_user>
@@ -74,7 +74,7 @@ $ sudo nano /etc/udev/rules.d/99-gpio.rules
 ```
 $ echo XX &gt; /sys/class/gpio/export
 ```
-
+Add an udev rule to have gpio group manage gpio pins like the following. 
 ```
 # /etc/udev/rules.d/99-gpio.rules
 # need to add group "gpio" for reading and writing access GPIO dir
