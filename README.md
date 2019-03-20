@@ -61,7 +61,7 @@ BCM to GPIO
     40: 199,  # PG7 (UART1_RX/PG_EINT7)
 ```   
 
-Home Assistant not working by root user, so need to add group "gpio" and the hass user belongs to it.
+Home Assistant not working by root user, so need to add group "gpio" and have the hass user belong to it.
 
 ```
 $ sudo usermod -aG gpio <current_user>
