@@ -24,7 +24,7 @@ OPi.GPIO Component is not only for Orangepi ZERO, but also other Orangepi models
 
 Please check also python codes in OPi.GPIO/orangepi/ folder to make other models working on.
 
-### ex) If you wish to control GPIO on Orangepi PC, put the followings into the  "__init__.py"
+### ex) If you wish to control GPIO on Orangepi PC, put the followings into the  "\_\_init\_\_.py"
 
 ```python
    import orangepi.pc
