@@ -18,6 +18,7 @@ Install OPi.GPIO with pip in the python venv installed homeassistant.
 -------------
 
 According to the Home Assistant instruction, put this into **config_folder/custom_components** folder, but not works, so need to copy this into **homeassistant/component** folder.
+
 **homeassistant/lib/python3.5/site-packages/homeassistant/components/opi_gpio**
 
 -------------
