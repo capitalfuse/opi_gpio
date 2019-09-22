@@ -71,6 +71,7 @@ BCM to GPIO
 Home Assistant not working by root user, so need to add group "gpio" and have the hass user belong to it.
 
 ```
+$ sudo addgroup gpio
 $ sudo usermod -aG gpio <current_user>
 ```
 
