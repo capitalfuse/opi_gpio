@@ -80,7 +80,7 @@ $ sudo nano /etc/udev/rules.d/99-gpio.rules
 ```
 
 ```
-$ echo XX &gt; /sys/class/gpio/export
+$ echo XX > /sys/class/gpio/export
 ```
 Add an udev rule to have gpio group manage gpio pins like the following. 
 ```
