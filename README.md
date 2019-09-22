@@ -24,7 +24,7 @@ OPi.GPIO Component is not only for Orangepi ZERO, but also other Orangepi models
 
 Please check also python codes in OPi.GPIO/orangepi/ folder to make other models working on.
 
-### ex) If you wish to control GPIO on Orangepi PC, put the followings into the  __init__.py
+### ex) If you wish to control GPIO on Orangepi PC, put the followings into the  "__init__.py"
 
 ```python
    import orangepi.pc
@@ -32,7 +32,7 @@ Please check also python codes in OPi.GPIO/orangepi/ folder to make other models
    GPIO.setmode(orangepi.pc.BCM)
 ```
 
-**Pysical Pin No:BCM and GPIO on Orangepi PC**
+**Physical Pin No:BCM and GPIO on Orangepi PC**
 ```
 If you point out No.7, it shows GPIO6.
 BCM to GPIO
