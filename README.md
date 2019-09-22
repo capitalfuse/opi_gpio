@@ -84,6 +84,8 @@ $ echo XX > /sys/class/gpio/export
 ```
 Add an udev rule to have gpio group manage gpio pins like the following. 
 ```
+$sudo pico /etc/udev/rules.d/99-gpio.rules
+
 # /etc/udev/rules.d/99-gpio.rules
 # need to add group "gpio" for reading and writing access GPIO dir
 #
@@ -95,6 +97,12 @@ SUBSYSTEM=="gpio", PROGRAM="/bin/sh -c '/bin/chmod -R ug+rw /sys/class/gpio'"
 SUBSYSTEM=="gpio", PROGRAM="/bin/sh -c '/bin/chown -R root:gpio /sys/devices/platform/soc/1c20800.pinctrl/gpiochip0/gpio'"
 #Group chmod
 SUBSYSTEM=="gpio", PROGRAM="/bin/sh -c '/bin/chmod -R ug+rw /sys/devices/platform/soc/1c20800.pinctrl/gpiochip0/gpio'"
+```
+or make more simple 
+```
+$ sudo pico /etc/udev/rules.d/10-gpio.rules
+
+SUBSYSTEM=="gpio*", PROGRAM="/bin/sh -c 'find -L /sys/class/gpio/ -maxdepth 2 -exec chown root:gpio {} \; -exec chmod 770 {} \; || true'"
 
 ```
 **reload config**
