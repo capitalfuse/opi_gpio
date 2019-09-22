@@ -1,6 +1,8 @@
 # opi_gpio
 ### Home Assistant Custom Component for Orangepi GPIO
 
+To control switch, binary and cover devices on GPIO 
+
 **Requirement**
 
 **OPi.GPIO**
@@ -9,8 +11,10 @@ https://github.com/rm-hull/OPi.GPIO
 
 https://pypi.org/project/OPi.GPIO/
 
+Install OPi.GPIO with pip in the python venv installed homeassistant.
 ```
-pip install OPi.GPIO 
+(homeassistant)$ pip install OPi.GPIO
+ 
 ```
 -------------
 
@@ -21,13 +25,14 @@ OPi.GPIO Component is not only for Orangepi ZERO, but also other Orangepi models
 
 Please check also python codes in OPi.GPIO/orangepi/ folder to make other models working on.
 
-**ex) Orangepi PC**
+**ex) If you wish to control GPIO on Orangepi PC, put the followings into the  __init__.py **
 ```python
    import orangepi.pc
    from OPi import GPIO
    GPIO.setmode(orangepi.pc.BCM)
 ```
 
+**pysical Pin No:BCM and GPIO on Orangepi PC**
 ```
 If you point out No.7, it shows GPIO6.
 BCM to GPIO
