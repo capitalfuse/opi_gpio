@@ -1,64 +1,60 @@
 """Support for controlling GPIO pins of a Orange Pi."""
+
 import logging
 
-from homeassistant.const import (
-    EVENT_HOMEASSISTANT_START, EVENT_HOMEASSISTANT_STOP)
+from OPi import GPIO
 
-REQUIREMENTS = ['OPi.GPIO==0.3.5']
+from homeassistant.const import EVENT_HOMEASSISTANT_START, EVENT_HOMEASSISTANT_STOP
+
+from .const import PIN_MODES
 
 _LOGGER = logging.getLogger(__name__)
 
-DOMAIN = 'opi_gpio'
+DOMAIN = "orangepi_gpio"
+PLATFORMS = ["binary_sensor", "cover", "switch"]
 
 
-def setup(hass, config):
-    """Set up the Orange PI GPIO component."""
-    import orangepi.pc
-    from OPi import GPIO  # pylint: disable=import-error
+async def async_setup(hass, config):
+    """Set up the Orange Pi GPIO component."""
 
     def cleanup_gpio(event):
         """Stuff to do before stopping."""
         GPIO.cleanup()
 
     def prepare_gpio(event):
-        """Stuff to do when home assistant starts."""
-        hass.bus.listen_once(EVENT_HOMEASSISTANT_STOP, cleanup_gpio)
+        """Stuff to do when Home Assistant starts."""
+        hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STOP, cleanup_gpio)
 
-    hass.bus.listen_once(EVENT_HOMEASSISTANT_START, prepare_gpio)
-    GPIO.setmode(orangepi.pc.BOARD)
+    hass.bus.async_listen_once(EVENT_HOMEASSISTANT_START, prepare_gpio)
     return True
 
 
+def setup_mode(mode):
+    """Set GPIO pin mode."""
+    _LOGGER.debug("Setting GPIO pin mode as %s", PIN_MODES[mode])
+    GPIO.setmode(PIN_MODES[mode])
+
 def setup_output(port):
     """Set up a GPIO as output."""
-    from OPi import GPIO  # pylint: disable=import-error
     GPIO.setup(port, GPIO.OUT)
 
-
-def setup_input(port, pull_mode):
+def setup_input(port):
     """Set up a GPIO as input."""
-    from OPi import GPIO  # pylint: disable=import-error
+    _LOGGER.debug("Setting up GPIO pin %i as input", port)
     GPIO.setup(port, GPIO.IN)
-               # GPIO.PUD_DOWN if pull_mode == 'DOWN' else GPIO.PUD_UP)
-
 
 def write_output(port, value):
     """Write a value to a GPIO."""
-    from OPi import GPIO  # pylint: disable=import-error
     GPIO.output(port, value)
 
 
 def read_input(port):
     """Read a value from a GPIO."""
-    from OPi import GPIO  # pylint: disable=import-error
+    _LOGGER.debug("Reading GPIO pin %i", port)
     return GPIO.input(port)
 
 
-def edge_detect(port, event_callback, bounce):
+def edge_detect(port, event_callback):
     """Add detection for RISING and FALLING events."""
-    from OPi import GPIO  # pylint: disable=import-error
-    GPIO.add_event_detect(
-        port,
-        GPIO.BOTH,
-        callback=event_callback,
-        bouncetime=bounce)
+    _LOGGER.debug("Add callback for GPIO pin %i", port)
+    GPIO.add_event_detect(port, GPIO.BOTH, callback=event_callback)

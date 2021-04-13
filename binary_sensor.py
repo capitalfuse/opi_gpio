@@ -1,73 +1,52 @@
-"""Support for binary sensor using OPi GPIO."""
-import logging
+"""Support for binary sensor using Orange Pi GPIO."""
 
-import voluptuous as vol
+from homeassistant.components.binary_sensor import PLATFORM_SCHEMA, BinarySensorEntity
 
-from homeassistant.components import opi_gpio
-from homeassistant.components.binary_sensor import (
-    BinarySensorDevice, PLATFORM_SCHEMA)
-from homeassistant.const import DEVICE_DEFAULT_NAME
-import homeassistant.helpers.config_validation as cv
+from . import edge_detect, read_input, setup_input, setup_mode
+from .const import CONF_INVERT_LOGIC, CONF_PIN_MODE, CONF_PORTS, PORT_SCHEMA
 
-_LOGGER = logging.getLogger(__name__)
-
-CONF_BOUNCETIME = 'bouncetime'
-CONF_INVERT_LOGIC = 'invert_logic'
-CONF_PORTS = 'ports'
-CONF_PULL_MODE = 'pull_mode'
-
-DEFAULT_BOUNCETIME = 50
-DEFAULT_INVERT_LOGIC = False
-DEFAULT_PULL_MODE = 'UP'
-
-DEPENDENCIES = ['opi_gpio']
-
-_SENSORS_SCHEMA = vol.Schema({
-    cv.positive_int: cv.string,
-})
-
-PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
-    vol.Required(CONF_PORTS): _SENSORS_SCHEMA,
-    vol.Optional(CONF_BOUNCETIME, default=DEFAULT_BOUNCETIME): cv.positive_int,
-    vol.Optional(CONF_INVERT_LOGIC, default=DEFAULT_INVERT_LOGIC): cv.boolean,
-    vol.Optional(CONF_PULL_MODE, default=DEFAULT_PULL_MODE): cv.string,
-})
+PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(PORT_SCHEMA)
 
 
-def setup_platform(hass, config, add_entities, discovery_info=None):
-    """Set up the Orange PI GPIO devices."""
-    pull_mode = config.get(CONF_PULL_MODE)
-    bouncetime = config.get(CONF_BOUNCETIME)
-    invert_logic = config.get(CONF_INVERT_LOGIC)
-
+async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
+    """Set up the Orange Pi GPIO platform."""
     binary_sensors = []
-    ports = config.get('ports')
+    invert_logic = config[CONF_INVERT_LOGIC]
+    pin_mode = config[CONF_PIN_MODE]
+    ports = config[CONF_PORTS]
+
+    setup_mode(pin_mode)
+
     for port_num, port_name in ports.items():
-        binary_sensors.append(OPiGPIOBinarySensor(
-            port_name, port_num, pull_mode, bouncetime, invert_logic))
-    add_entities(binary_sensors, True)
+        binary_sensors.append(
+            OPiGPIOBinarySensor(hass, port_name, port_num, invert_logic)
+        )
+    async_add_entities(binary_sensors)
 
 
-class OPiGPIOBinarySensor(BinarySensorDevice):
+class OPiGPIOBinarySensor(BinarySensorEntity):
     """Represent a binary sensor that uses Orange Pi GPIO."""
 
-    def __init__(self, name, port, pull_mode, bouncetime, invert_logic):
-        """Initialize the OPi binary sensor."""
-        self._name = name or DEVICE_DEFAULT_NAME
+    def __init__(self, hass, name, port, invert_logic):
+        """Initialize the Orange Pi binary sensor."""
+        self._name = name
         self._port = port
-        self._pull_mode = pull_mode
-        self._bouncetime = bouncetime
         self._invert_logic = invert_logic
         self._state = None
 
-        opi_gpio.setup_input(self._port, self._pull_mode)
+    async def async_added_to_hass(self):
+        """Run when entity about to be added to hass."""
 
-        def read_gpio(port):
-            """Read state from GPIO."""
-            self._state = opi_gpio.read_input(self._port)
-            self.schedule_update_ha_state()
+        def gpio_edge_listener(port):
+            """Update GPIO when edge change is detected."""
+            self.schedule_update_ha_state(True)
 
-        opi_gpio.edge_detect(self._port, read_gpio, self._bouncetime)
+        def setup_entity():
+            setup_input(self._port)
+            edge_detect(self._port, gpio_edge_listener)
+            self.schedule_update_ha_state(True)
+
+        await self.hass.async_add_executor_job(setup_entity)
 
     @property
     def should_poll(self):
@@ -85,5 +64,5 @@ class OPiGPIOBinarySensor(BinarySensorDevice):
         return self._state != self._invert_logic
 
     def update(self):
-        """Update the GPIO state."""
-        self._state = opi_gpio.read_input(self._port)
+        """Update state with new GPIO data."""
+        self._state = read_input(self._port)
